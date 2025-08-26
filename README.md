@@ -1,0 +1,1 @@
+This project serves as a hands-on guide to help the fundamentals of Docker.
