@@ -1,6 +1,6 @@
 # Stage 1: build the React app using Node
 # use node image for building
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # working dir in builder
 WORKDIR /app

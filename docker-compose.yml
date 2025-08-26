@@ -1,0 +1,41 @@
+version: '3.8'                                   # compose file format
+
+services:
+  mongo:                                         # MongoDB service
+    image: mongo:6.0                             # official Mongo image
+    restart: unless-stopped                      # restart policy
+    volumes:
+      - mongo-data:/data/db                      # persist DB data in named volume
+    networks:
+      - app-network                              # attach to app network
+
+  backend:                                       # backend service
+    build:
+      context: ./backend                          # build from backend folder
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/todos    # connect to mongo by service name
+      - PORT=4000
+    ports:
+      - "4000:4000"                              # expose backend to host (optional)
+    depends_on:
+      - mongo                                    # ensure mongo starts before backend
+    networks:
+      - app-network
+
+  frontend:                                      # frontend (static served by nginx)
+    build:
+      context: ./frontend                         # build frontend (multi-stage)
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"                                  # serve site on host port 80
+    depends_on:
+      - backend                                  # ensure backend is started (for proxy)
+    networks:
+      - app-network
+
+volumes:
+  mongo-data: {}                                  # named volume to persist Mongo data
+
+networks:
+  app-network: {}                                 # user-defined network (optional)
